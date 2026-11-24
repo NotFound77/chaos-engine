@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>⚡ CHAOS ENGINE — Logistic Map Machine</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Laboratory Header -->
+  <header>
+    <div class="header-inner">
+      <div class="header-branding">
+        <div class="kicker">INTERACTIVE DYNAMICAL SYSTEMS LAB</div>
+        <h1>⚡ CHAOS ENGINE</h1>
+        <p class="subtitle">LOGISTIC MAP MACHINE — PHYSICAL ARDUINO CONTROLLER & REAL-TIME DYNAMICAL VISUALISATION</p>
+      </div>
+      <div class="header-actions">
+        <div id="hw-status-badge" class="status-pill pill-simulation">
+          <span class="pill-dot"></span> SIMULATION MODE
+        </div>
+        <div id="exp-status-badge" class="status-pill pill-ready">
+          <span class="pill-dot"></span> READY
+        </div>
+        <button id="btn-connect-serial" class="btn-connect">
+          <span class="btn-icon">🔌</span> CONNECT ARDUINO (115200 BAUD)
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Mathematical Foundation Banner -->
+    <section class="equation-bar">
+      <div class="eq-left">
+        <div class="eq-formula">x<sub>n+1</sub> = r &middot; x<sub>n</sub>(1 &minus; x<sub>n</sub>)</div>
+        <div class="eq-domain">[ 0 &le; r &le; 4 &nbsp;|&nbsp; 0 &le; x<sub>0</sub> &le; 1 &nbsp;|&nbsp; 5 &le; N &le; 500 ]</div>
+      </div>
+      <div class="eq-desc">
+        Deterministic nonlinear recurrence exhibiting period-doubling route to chaos. Calculated live using 64-bit IEEE 754 floating-point arithmetic.
+      </div>
+    </section>
+
+    <div class="app-container">
+      <!-- Left Column: Physical & Virtual Control Console -->
+      <aside class="panel">
+        <div class="panel-header">
+          <h2><span>🎛</span> PHYSICAL CONTROLLER</h2>
+          <span id="hw-status-msg" class="hardware-cue">Simulation Active</span>
+        </div>
+
+        <!-- Visual Replica of Physical Arduino Controls -->
+        <div class="physical-console">
+          <div class="console-title">
+            <span>ARDUINO UNO R3 CONSOLE</span>
+            <span class="hardware-cue">115200 BAUD</span>
+          </div>
+
+          <div class="dials-grid">
+            <!-- POT 1: Growth Parameter r -->
+            <div class="dial-box">
+              <div class="dial-tag">POT 1 &mdash; GROWTH (r)</div>
+              <div class="dial-gauge">
+                <svg class="knob-svg" viewBox="0 0 72 72">
+                  <circle cx="36" cy="36" r="30" fill="#0d182b" stroke="#1f3454" stroke-width="3" />
+                  <circle cx="36" cy="36" r="24" fill="#09101d" stroke="#00e5ff" stroke-width="1.5" stroke-dasharray="113" stroke-dashoffset="30" />
+                  <g id="knob-r-needle" class="knob-needle" style="transform: rotate(-71deg);">
+                    <line x1="36" y1="36" x2="36" y2="14" stroke="#00e5ff" stroke-width="2.5" stroke-linecap="round" />
+                    <circle cx="36" cy="36" r="4" fill="#ffffff" />
+                  </g>
+                </svg>
+              </div>
+              <div id="r-val" class="dial-num">0.940</div>
+              <div class="dial-unit">0.000 &mdash; 4.000</div>
+            </div>
+
+            <!-- POT 2: Initial Condition x0 -->
+            <div class="dial-box">
+              <div class="dial-tag">POT 2 &mdash; INITIAL (x₀)</div>
+              <div class="dial-gauge">
+                <svg class="knob-svg" viewBox="0 0 72 72">
+                  <circle cx="36" cy="36" r="30" fill="#0d182b" stroke="#1f3454" stroke-width="3" />
+                  <circle cx="36" cy="36" r="24" fill="#09101d" stroke="#ffc400" stroke-width="1.5" stroke-dasharray="113" stroke-dashoffset="30" />
+                  <g id="knob-x0-needle" class="knob-needle" style="transform: rotate(-10deg);">
+                    <line x1="36" y1="36" x2="36" y2="14" stroke="#ffc400" stroke-width="2.5" stroke-linecap="round" />
+                    <circle cx="36" cy="36" r="4" fill="#ffffff" />
+                  </g>
+                </svg>
+              </div>
+              <div id="x0-val" class="dial-num">0.4600</div>
+              <div class="dial-unit">0.000 &mdash; 1.000</div>
+            </div>
+
+            <!-- Rotary Encoder: Iteration Count N -->
+            <div class="dial-box full-width">
+              <div class="dial-tag" style="margin: 0;">ROTARY ENCODER &mdash; ITERATION COUNT (N)</div>
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <svg id="knob-n-dial" width="40" height="40" viewBox="0 0 40 40" style="transition: transform 0.1s linear;">
+                  <circle cx="20" cy="20" r="17" fill="#131e33" stroke="#2a4168" stroke-width="2" />
+                  <circle cx="20" cy="7" r="2.5" fill="#00e676" />
+                </svg>
+                <div id="n-val" class="dial-num" style="color: #00e676; font-size: 20px;">90</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Physical Push Buttons Replica -->
+          <div class="buttons-replica">
+            <button id="btn-start" class="btn-arcade">
+              <span class="btn-icon">▶</span> BUTTON 1<br>START / PAUSE
+            </button>
+            <button id="btn-reset" class="btn-arcade">
+              <span class="btn-icon">↺</span> BUTTON 2<br>RESET
+            </button>
+            <button id="btn-compare" class="btn-arcade">
+              <span class="btn-icon">⚖</span> BUTTON 3<br>COMPARE
+            </button>
+          </div>
+        </div>
+
+        <!-- Simulation Sliders (active when hardware disconnected or manual override) -->
+        <div class="slider-group">
+          <div class="slider-header">
+            <label for="r-slider">Growth Parameter r</label>
+            <span class="slider-val-badge">0 &le; r &le; 4</span>
+          </div>
+          <input id="r-slider" type="range" min="0" max="4" step="0.001" value="0.94">
+          <div class="slider-hint">Controls nonlinear feedback intensity (Potentiometer 1 / Pin A0)</div>
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <label for="x0-slider">Initial Condition x<sub>0</sub></label>
+            <span class="slider-val-badge">0 &le; x₀ &le; 1</span>
+          </div>
+          <input id="x0-slider" type="range" min="0" max="1" step="0.0005" value="0.46">
+          <div class="slider-hint">Starting population fraction (Potentiometer 2 / Pin A1)</div>
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <label for="n-slider">Iteration Count N</label>
+            <span class="slider-val-badge">5 &le; N &le; 500</span>
+          </div>
+          <input id="n-slider" type="range" min="5" max="500" step="5" value="90">
+          <div class="slider-hint">Calculation trajectory depth (Rotary Encoder / Pins D2 &amp; D3)</div>
+        </div>
+
+        <!-- Scientific Experiment Presets -->
+        <div class="presets-container">
+          <label>Exhibition Experiment Presets</label>
+          <div class="preset-buttons">
+            <button data-preset="Decay" data-r="0.5" data-x="0.2">Decay<br><small>r = 0.50</small></button>
+            <button data-preset="Stable" data-r="2.0" data-x="0.2">Stable<br><small>r = 2.00</small></button>
+            <button data-preset="Period 2" data-r="3.2" data-x="0.2">Period 2<br><small>r = 3.20</small></button>
+            <button data-preset="Period 4" data-r="3.5" data-x="0.2">Period 4<br><small>r = 3.50</small></button>
+            <button data-preset="Chaotic" data-r="3.9" data-x="0.2">Chaotic<br><small>r = 3.90</small></button>
+            <button data-preset="Custom" data-r="3.83" data-x="0.2">Period 3<br><small>r = 3.83</small></button>
+          </div>
+        </div>
+
+        <!-- Virtual Serial Simulator (for testing without physical hardware) -->
+        <div class="virtual-sim-box">
+          <details>
+            <summary>🧪 Hardware Diagnostic &amp; Serial Test</summary>
+            <div class="sim-tools">
+              <p class="slider-hint">Simulate raw serial events sent from Arduino Uno R3:</p>
+              <button onclick="window.ChaosSerial.injectSimulatedLine('PARAM,3.900,0.460,100')">Send PARAM: r=3.900, x₀=0.460, N=100</button>
+              <button onclick="window.ChaosSerial.injectSimulatedLine('EVENT,START')">Send EVENT: START</button>
+              <button onclick="window.ChaosSerial.injectSimulatedLine('EVENT,COMPARE')">Send EVENT: COMPARE</button>
+              <button onclick="window.ChaosSerial.injectSimulatedLine('EVENT,RESET')">Send EVENT: RESET</button>
+              <button onclick="window.ChaosSerial.injectSimulatedLine('READY,CHAOS_ENGINE,1')">Send Handshake: READY,CHAOS_ENGINE,1</button>
+            </div>
+          </details>
+        </div>
+      </aside>
+
+      <!-- Right Column: Telemetry & Visualisations -->
+      <section class="content-section">
+        <!-- Live Experiment Telemetry Metrics -->
+        <div class="telemetry-grid">
+          <div class="metric-card">
+            <div class="metric-label">Current State Value x(N)</div>
+            <div id="metric-current" class="metric-value">&mdash;</div>
+            <div class="metric-sub">Trajectory final state value</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Fixed Point(s) in [0, 1]</div>
+            <div id="metric-fixed" class="metric-value" style="font-size: 15px;">&mdash;</div>
+            <div class="metric-sub">Roots of x = f(x)</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Observed Behaviour</div>
+            <div id="metric-behaviour" class="metric-value" style="font-size: 16px;">&mdash;</div>
+            <div class="metric-sub">Dynamical regime classification</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Lyapunov Exponent (&lambda;)</div>
+            <div id="metric-lyapunov" class="metric-value">&mdash;</div>
+            <div class="metric-sub">&lambda; &gt; 0 indicates deterministic chaos</div>
+          </div>
+        </div>
+
+        <!-- 6 Required Scientific Visualisations -->
+        <div class="visualisations-grid">
+          <!-- 1. Iteration Graph -->
+          <article class="card">
+            <div class="card-header">
+              <h2 class="card-title">1. Iteration Graph <span class="card-tag">x(n) vs n</span></h2>
+              <div class="card-actions">
+                <button class="btn-tool" data-reset-chart="iteration">Reset Zoom</button>
+              </div>
+            </div>
+            <canvas id="canvas-iteration" class="chart-canvas"></canvas>
+            <div id="coord-iteration" class="coord-box">
+              <span class="coord-placeholder">Selected point: none &mdash; click any point to pin coordinates.</span>
+            </div>
+          </article>
+
+          <!-- 2. Cobweb Diagram -->
+          <article class="card">
+            <div class="card-header">
+              <h2 class="card-title">2. Cobweb Diagram <span class="card-tag">x(n+1) vs x(n)</span></h2>
+              <div class="card-actions">
+                <button class="btn-tool" data-reset-chart="cobweb">Reset Zoom</button>
+              </div>
+            </div>
+            <canvas id="canvas-cobweb" class="chart-canvas"></canvas>
+            <div id="coord-cobweb" class="coord-box">
+              <span class="coord-placeholder">Selected point: none &mdash; click any point on the cobweb path or curve.</span>
+            </div>
+          </article>
+
+          <!-- 3. Fixed-Point Stability & Derivatives -->
+          <article class="card">
+            <div class="card-header">
+              <h2 class="card-title">3. Fixed Points &amp; Linear Stability <span class="card-tag">|f&prime;(x*)| &lt; 1</span></h2>
+            </div>
+            <div class="stability-container">
+              <div id="stability-details">Calculating stability...</div>
+              <div id="stability-formula" class="stability-formula-box"></div>
+            </div>
+          </article>
+
+          <!-- 4. Numerical Sequence -->
+          <article class="card">
+            <div class="card-header">
+              <h2 class="card-title">4. Numerical Sequence <span class="card-tag">Calculated Trajectory Values</span></h2>
+              <div class="card-actions">
+                <button id="btn-copy-seq" class="btn-tool">Copy CSV</button>
+              </div>
+            </div>
+            <div class="sequence-container">
+              <div id="sequence-list" class="sequence-scroll"></div>
+              <p class="slider-hint">Values are computed on the fly with double-precision floating-point arithmetic.</p>
+            </div>
+          </article>
+
+          <!-- 5. Bifurcation Diagram -->
+          <article class="card wide">
+            <div class="card-header">
+              <h2 class="card-title">5. Bifurcation Diagram <span class="card-tag">Long-Term Attractor Across Growth Parameter r</span></h2>
+              <div class="card-actions">
+                <button class="btn-tool" data-reset-chart="bifurcation">Reset Zoom</button>
+              </div>
+            </div>
+            <canvas id="canvas-bifurcation" class="chart-canvas tall"></canvas>
+            <div id="coord-bifurcation" class="coord-box">
+              <span class="coord-placeholder">Selected point: none &mdash; click any point on the diagram to inspect (r, x).</span>
+            </div>
+          </article>
+
+          <!-- 6. Comparison Graph (Essential Feature: Butterfly Effect / Sensitivity to Initial Conditions) -->
+          <article id="card-comparison" class="card wide" style="display: none;">
+            <div class="card-header">
+              <h2 class="card-title">
+                <span>6. Trajectory Comparison &amp; Sensitivity Analysis</span>
+                <span class="card-tag">Sensitive Dependence on Initial Conditions</span>
+              </h2>
+              <div class="card-actions">
+                <button class="btn-tool" data-reset-chart="comparison">Reset Zoom</button>
+              </div>
+            </div>
+
+            <div class="comparison-controls">
+              <label for="delta-select">Perturbation Magnitude (&Delta;x<sub>0</sub>):</label>
+              <select id="delta-select">
+                <option value="0.00001">&Delta;x₀ = 0.00001 (10⁻⁵)</option>
+                <option value="0.0001" selected>&Delta;x₀ = 0.0001 (10⁻⁴ - Default)</option>
+                <option value="0.001">&Delta;x₀ = 0.001 (10⁻³)</option>
+                <option value="0.01">&Delta;x₀ = 0.01 (10⁻²)</option>
+              </select>
+              <span class="slider-hint">Trajectory A: Cyan (x₀) &bull; Trajectory B: Magenta (x₀ + &Delta;x₀) &bull; Shaded Area: Divergence</span>
+            </div>
+
+            <canvas id="canvas-comparison" class="chart-canvas"></canvas>
+            <div id="coord-comparison" class="coord-box">
+              <span class="coord-placeholder">Selected point: none &mdash; click any point to inspect dual trajectory divergence.</span>
+            </div>
+
+            <div id="comparison-summary"></div>
+
+            <div class="theory-note">
+              <strong>Dynamical Theory:</strong> In chaotic regimes (&lambda; &gt; 0), two trajectories starting with an infinitesimal difference &Delta;x(0) diverge exponentially at a rate governed by the Lyapunov exponent: <em>|&Delta;x(n)| &approx; &Delta;x(0) &middot; e<sup>&lambda;n</sup></em>. In stable regimes (&lambda; &lt; 0), perturbations decay to zero and trajectories synchronize onto the same attractor.
+            </div>
+          </article>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div>⚡ CHAOS ENGINE &mdash; Logistic Map Machine &bull; Physical Mathematics Exhibition Project</div>
+    <div>Hardware: Arduino Uno R3 &bull; Baud Rate: 115200 &bull; Web Serial API &bull; IEEE 754 Float64 Arithmetic</div>
+  </footer>
+
+  <!-- Scripts in dependency order -->
+  <script src="src/math/logistic.js"></script>
+  <script src="src/hardware/protocol.js"></script>
+  <script src="src/hardware/serial.js"></script>
+  <script src="src/charts/chartBase.js"></script>
+  <script src="src/charts/iterationChart.js"></script>
+  <script src="src/charts/cobwebChart.js"></script>
+  <script src="src/charts/bifurcationChart.js"></script>
+  <script src="src/charts/comparisonChart.js"></script>
+  <script src="src/ui/controls.js"></script>
+  <script src="src/ui/status.js"></script>
+  <script src="src/app.js"></script>
+</body>
+</html>

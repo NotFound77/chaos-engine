@@ -1,0 +1,21 @@
+{
+  "name": "chaos-engine",
+  "version": "1.0.0",
+  "description": "CHAOS ENGINE — Interactive Logistic Map Machine with Arduino Physical Controller",
+  "scripts": {
+    "start": "python3 server.py",
+    "serve:static": "python3 -m http.server 8000",
+    "build": "node tests/test_math_protocol.js && node tests/test_app_integration.js",
+    "test": "node tests/test_math_protocol.js && node tests/test_app_integration.js"
+  },
+  "keywords": [
+    "chaos-theory",
+    "logistic-map",
+    "arduino",
+    "web-serial",
+    "dynamical-systems",
+    "scientific-visualisation"
+  ],
+  "author": "Google Deepmind & Antigravity Engineering Team",
+  "license": "MIT"
+}

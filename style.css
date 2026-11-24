@@ -1,0 +1,937 @@
+:root {
+  --bg: #070b14;
+  --bg-gradient: radial-gradient(ellipse at 50% 0%, #131f38 0%, #070b14 70%);
+  --panel: #0d1627;
+  --panel-card: #101c32;
+  --panel-border: #1e2e4a;
+  --line: #233758;
+  --text: #edf3ff;
+  --text-muted: #8fa5c4;
+  --cyan: #00e5ff;
+  --cyan-glow: rgba(0, 229, 255, 0.4);
+  --blue: #2979ff;
+  --green: #00e676;
+  --green-glow: rgba(0, 230, 118, 0.4);
+  --amber: #ffab00;
+  --amber-glow: rgba(255, 171, 0, 0.4);
+  --magenta: #ff2a85;
+  --magenta-glow: rgba(255, 42, 133, 0.4);
+  --red: #ff5252;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  background-image: var(--bg-gradient);
+  background-attachment: fixed;
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.5;
+  min-height: 100vh;
+  padding-bottom: 60px;
+}
+
+/* Header & Mission Banner */
+header {
+  padding: 24px clamp(16px, 4vw, 48px);
+  border-bottom: 1px solid var(--line);
+  background: rgba(11, 18, 32, 0.85);
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-inner {
+  max-width: 1600px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.kicker {
+  color: var(--cyan);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+h1 {
+  font-size: clamp(26px, 4vw, 38px);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-shadow: 0 0 20px var(--cyan-glow);
+}
+
+.subtitle {
+  color: var(--text-muted);
+  font-size: 13px;
+  max-width: 750px;
+  margin-top: 4px;
+}
+
+/* Header Action Controls */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Status Pills */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+}
+
+.pill-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.pill-dot.pulse {
+  box-shadow: 0 0 10px currentColor;
+  animation: pulseAnim 1.2s infinite alternate;
+}
+
+@keyframes pulseAnim {
+  0% { transform: scale(0.9); opacity: 0.6; }
+  100% { transform: scale(1.3); opacity: 1; }
+}
+
+.pill-online {
+  background: rgba(0, 230, 118, 0.15);
+  border-color: rgba(0, 230, 118, 0.5);
+  color: var(--green);
+}
+
+.pill-simulation {
+  background: rgba(0, 229, 255, 0.12);
+  border-color: rgba(0, 229, 255, 0.4);
+  color: var(--cyan);
+}
+
+.pill-offline {
+  background: rgba(255, 82, 82, 0.15);
+  border-color: rgba(255, 82, 82, 0.5);
+  color: var(--red);
+}
+
+.pill-ready {
+  background: rgba(0, 229, 255, 0.15);
+  border-color: rgba(0, 229, 255, 0.4);
+  color: var(--cyan);
+}
+
+.pill-running {
+  background: rgba(0, 230, 118, 0.2);
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.pill-paused {
+  background: rgba(255, 171, 0, 0.15);
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+/* Connect Arduino Button */
+.btn-connect {
+  background: linear-gradient(135deg, #182e4e, #101e36);
+  border: 1px solid var(--cyan);
+  color: #ffffff;
+  padding: 8px 18px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 750;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 15px rgba(0, 229, 255, 0.15);
+}
+
+.btn-connect:hover {
+  background: linear-gradient(135deg, #1d3961, #162a4b);
+  border-color: #ffffff;
+  box-shadow: 0 0 20px var(--cyan-glow);
+}
+
+.btn-connect.connected {
+  border-color: var(--green);
+  box-shadow: 0 0 15px var(--green-glow);
+}
+
+/* Main Layout */
+main {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 24px clamp(14px, 3vw, 40px);
+}
+
+/* Mathematical Equation Bar */
+.equation-bar {
+  background: linear-gradient(90deg, #101c32 0%, #15243f 50%, #101c32 100%);
+  border: 1px solid #293f66;
+  border-radius: 14px;
+  padding: 14px 24px;
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.35);
+}
+
+.eq-left {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+
+.eq-formula {
+  font-family: "Georgia", "Cambria", serif;
+  font-size: clamp(22px, 3vw, 28px);
+  color: #ffffff;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+}
+
+.eq-domain {
+  color: var(--cyan);
+  font-size: 13px;
+  font-family: ui-monospace, monospace;
+}
+
+.eq-desc {
+  color: var(--text-muted);
+  font-size: 13px;
+  max-width: 600px;
+}
+
+/* App Grid Container */
+.app-container {
+  display: grid;
+  grid-template-columns: 360px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+/* Sidebar & Cards */
+.panel, .card {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.panel {
+  padding: 20px;
+  position: sticky;
+  top: 96px;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 12px;
+  margin-bottom: 18px;
+}
+
+.panel-header h2 {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--cyan);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Physical Console Replica Visualiser */
+.physical-console {
+  background: #09101d;
+  border: 1px solid #233654;
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.console-title {
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  display: flex;
+  justify-content: space-between;
+}
+
+.hardware-cue {
+  color: var(--green);
+  font-size: 10px;
+}
+
+.dials-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.dial-box {
+  background: #0d1629;
+  border: 1px solid #1c2b44;
+  border-radius: 12px;
+  padding: 12px 8px;
+  text-align: center;
+  position: relative;
+}
+
+.dial-box.full-width {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 10px 16px;
+}
+
+.dial-tag {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--cyan);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.dial-gauge {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 6px;
+  position: relative;
+}
+
+.knob-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.knob-needle {
+  transform-origin: 36px 36px;
+  transition: transform 0.06s linear;
+}
+
+.dial-num {
+  font-family: ui-monospace, monospace;
+  font-size: 16px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+}
+
+.dial-unit {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+/* Physical Buttons Replica */
+.buttons-replica {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.btn-arcade {
+  background: #152238;
+  border: 1px solid #283c5d;
+  border-radius: 10px;
+  padding: 10px 6px;
+  color: var(--text);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.btn-arcade:hover {
+  background: #1c2e4d;
+  border-color: var(--cyan);
+}
+
+.btn-arcade:active {
+  transform: translateY(2px);
+}
+
+.btn-arcade.active {
+  box-shadow: 0 0 15px currentColor;
+}
+
+.btn-arcade.btn-running {
+  background: rgba(0, 230, 118, 0.2);
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.btn-arcade.btn-comparing {
+  background: rgba(255, 42, 133, 0.2);
+  border-color: var(--magenta);
+  color: var(--magenta);
+}
+
+/* Simulation Sliders Controls */
+.slider-group {
+  margin-bottom: 18px;
+}
+
+.slider-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.slider-header label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.slider-val-badge {
+  font-family: ui-monospace, monospace;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--cyan);
+}
+
+input[type="range"] {
+  width: 100%;
+  height: 6px;
+  background: #16243d;
+  border-radius: 3px;
+  outline: none;
+  accent-color: var(--cyan);
+  cursor: pointer;
+  margin-bottom: 4px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 8px var(--cyan);
+}
+
+.slider-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Presets Bar */
+.presets-container {
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+  margin-top: 16px;
+}
+
+.presets-container label {
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.preset-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.preset-buttons button {
+  background: #121e33;
+  border: 1px solid #233758;
+  color: var(--text);
+  padding: 7px 4px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.preset-buttons button:hover {
+  background: #1b2d4c;
+  border-color: var(--cyan);
+}
+
+.preset-buttons button.preset-active {
+  background: rgba(0, 229, 255, 0.2);
+  border-color: var(--cyan);
+  color: var(--cyan);
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
+}
+
+/* Virtual Serial Simulator Drawer */
+.virtual-sim-box {
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+  margin-top: 16px;
+}
+
+.virtual-sim-box details {
+  background: #09101d;
+  border: 1px solid #1c2b44;
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.virtual-sim-box summary {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--amber);
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  user-select: none;
+}
+
+.sim-tools {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sim-tools button {
+  background: #121c2e;
+  border: 1px solid #253956;
+  color: var(--text);
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: left;
+}
+
+.sim-tools button:hover {
+  background: #1a2a44;
+  border-color: var(--amber);
+}
+
+/* Right Section: Telemetry & Visualisations */
+.content-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Telemetry Stats Grid */
+.telemetry-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.metric-card {
+  background: var(--panel-card);
+  border: 1px solid var(--panel-border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.metric-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--cyan);
+}
+
+.metric-card:nth-child(2)::before { background: var(--blue); }
+.metric-card:nth-child(3)::before { background: var(--amber); }
+.metric-card:nth-child(4)::before { background: var(--magenta); }
+
+.metric-label {
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.metric-value {
+  font-family: ui-monospace, monospace;
+  font-size: 20px;
+  font-weight: 850;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+.metric-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* Visualisation Cards Grid */
+.visualisations-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.card {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+.card.wide {
+  grid-column: 1 / -1;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.card-title {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-tag {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-tool {
+  background: #142036;
+  border: 1px solid #233758;
+  color: var(--text-muted);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-tool:hover {
+  background: #1a2c4a;
+  border-color: var(--cyan);
+  color: #ffffff;
+}
+
+/* Canvas Styling */
+.chart-canvas {
+  width: 100%;
+  height: 280px;
+  display: block;
+  background: #080d1a;
+  border-radius: 8px;
+  touch-action: none;
+}
+
+.chart-canvas.tall {
+  height: 340px;
+}
+
+/* Coordinate Display Box */
+.coord-box {
+  margin-top: 10px;
+  background: #09101d;
+  border: 1px solid #1a2942;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  color: #b5c7e0;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+}
+
+.coord-box strong {
+  color: var(--amber);
+  margin-right: 6px;
+}
+
+.coord-placeholder {
+  color: #556c8c;
+  font-style: italic;
+}
+
+.coord-val {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+/* Card 3: Fixed Point Stability Layout */
+.stability-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.stability-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: #0a1222;
+  border: 1px solid #1b2c47;
+  border-radius: 8px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.fp-name {
+  font-size: 13px;
+  color: #ffffff;
+}
+
+.fp-deriv {
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  color: var(--cyan);
+}
+
+.fp-badge {
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.stability-formula-box {
+  background: #09101d;
+  border: 1px solid #1c2b44;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+/* Card 5: Comparison Section Styles */
+.comparison-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  background: #0a1222;
+  border: 1px solid #1c2d49;
+  border-radius: 8px;
+  padding: 8px 14px;
+}
+
+.comparison-controls label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--magenta);
+}
+
+.comparison-controls select {
+  background: #111d33;
+  border: 1px solid #283e63;
+  color: #ffffff;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+}
+
+.comp-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.comp-stat {
+  background: #0a1222;
+  border: 1px solid #1c2d49;
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+.stat-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.stat-val {
+  font-family: ui-monospace, monospace;
+  font-size: 13px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.badge-alert {
+  color: var(--magenta);
+}
+
+.badge-stable {
+  color: var(--green);
+}
+
+.theory-note {
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: rgba(255, 42, 133, 0.08);
+  border-left: 3px solid var(--magenta);
+  border-radius: 0 8px 8px 0;
+  font-size: 12px;
+  color: #ffc2dc;
+  line-height: 1.5;
+}
+
+/* Numerical Sequence Viewer */
+.sequence-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sequence-scroll {
+  max-height: 180px;
+  overflow-y: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px;
+  background: #080d1a;
+  border: 1px solid #1a2a44;
+  border-radius: 8px;
+}
+
+.seq-chip {
+  background: #0d172a;
+  border: 1px solid #1f3252;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  display: inline-flex;
+  gap: 6px;
+}
+
+.chip-n {
+  color: var(--cyan);
+}
+
+.chip-val {
+  color: #ffffff;
+}
+
+.seq-more {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Footer */
+footer {
+  max-width: 1600px;
+  margin: 40px auto 0;
+  padding: 20px clamp(14px, 3vw, 40px);
+  border-top: 1px solid var(--line);
+  color: var(--text-muted);
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* Responsive Media Queries */
+@media (max-width: 1100px) {
+  .app-container {
+    grid-template-columns: 1fr;
+  }
+  .panel {
+    position: static;
+  }
+  .telemetry-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .visualisations-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .telemetry-grid {
+    grid-template-columns: 1fr;
+  }
+  .dials-grid {
+    grid-template-columns: 1fr;
+  }
+  .comp-stat-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .chart-canvas {
+    height: 240px;
+  }
+}

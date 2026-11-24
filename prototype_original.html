@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CHAOS ENGINE — Logistic Map Machine</title>
+<style>
+:root{--bg:#090d18;--panel:#111a2b;--panel2:#172238;--line:#2a3852;--text:#edf3ff;--muted:#9aabc5;--cyan:#55d6e8;--gold:#f3bd58;--green:#69d6a4;--pink:#ed83c5;--red:#ff8585}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#172544 0,#090d18 55%);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{padding:25px clamp(16px,4vw,48px) 18px;border-bottom:1px solid var(--line);background:#0b1220d9}
+.kicker{color:var(--green);font-weight:700;letter-spacing:.16em;font-size:11px}h1{font-size:clamp(27px,5vw,43px);line-height:1.1;margin:7px 0}header p{color:var(--muted);margin:8px 0 0;max-width:850px}
+main{max-width:1500px;margin:auto;padding:20px clamp(12px,3vw,34px) 50px}
+.equation{border:1px solid #38506b;background:#101d30;border-radius:14px;padding:14px 18px;margin-bottom:16px;display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap}
+.eq{font:clamp(21px,3vw,30px) Georgia,serif;color:white}.eqnote{color:var(--muted);font-size:12px}
+.layout{display:grid;grid-template-columns:310px minmax(0,1fr);gap:16px;align-items:start}
+.panel,.card{background:linear-gradient(150deg,#131e31,#0f1727);border:1px solid var(--line);border-radius:16px;box-shadow:0 12px 35px #0003}
+.panel{padding:17px;position:sticky;top:12px}.panel h2,.card h2{font-size:16px;margin:0 0 12px}.control{padding:13px 0;border-top:1px solid #25334a}.control:first-of-type{border-top:0}.control label{display:flex;justify-content:space-between;gap:10px;font-weight:650}.value{font-variant-numeric:tabular-nums;color:var(--green)}input[type=range]{width:100%;accent-color:var(--cyan);margin:13px 0 3px}input[type=number]{background:#0b1423;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:7px;width:90px}
+.small{color:var(--muted);font-size:12px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}button{border:1px solid #405574;background:#1b2a42;color:var(--text);padding:9px 12px;border-radius:9px;font-weight:650;cursor:pointer}button:hover{border-color:var(--cyan);background:#233b57}button.primary{background:#087d8c;border-color:#22b8c5;color:white}button:disabled{opacity:.45;cursor:not-allowed}
+.results{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px}.metric{padding:12px 14px;background:#111d30;border:1px solid var(--line);border-radius:12px}.metric .label{color:var(--muted);font-size:12px}.metric .num{font-size:22px;font-weight:750;font-variant-numeric:tabular-nums}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.card{padding:14px;min-width:0}.card.wide{grid-column:1/-1}.card h2{display:flex;justify-content:space-between;align-items:center}.chart{width:100%;height:270px;display:block;background:#0b1321;border:1px solid #25334a;border-radius:10px;touch-action:none}.chart.tall{height:330px}.coord{margin-top:8px;padding:8px 10px;background:#0b1423;border:1px solid #293b55;border-radius:8px;color:#c6d6eb;font:12px ui-monospace,monospace;min-height:36px;overflow-wrap:anywhere}.coord strong{color:var(--gold)}.chart-tools{display:flex;gap:6px;flex-wrap:wrap}.chart-tools button{font-size:11px;padding:5px 8px}.sequence{max-height:220px;overflow:auto;display:flex;flex-wrap:wrap;gap:7px}.chip{background:#0b1423;border:1px solid #293b55;border-radius:7px;padding:5px 8px;font:12px ui-monospace,monospace}
+.status{padding:11px 13px;border-radius:10px;background:#102b2a;border:1px solid #245d51;color:#b8f3d9}.warning{background:#302419;border-color:#72502b;color:#ffdda8}
+footer{color:var(--muted);font-size:12px;margin-top:18px}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.panel{position:static}.grid{grid-template-columns:1fr}.card.wide{grid-column:auto}.results{grid-template-columns:1fr 1fr}.chart{height:245px}}
+</style>
+</head>
+<body>
+<header><div class="kicker">INTERACTIVE DYNAMICAL SYSTEMS LAB</div><h1>⚡ CHAOS ENGINE</h1><p>Logistic Map Machine · A real numerical experiment, not a prerecorded animation. Change the parameters and watch every calculation update.</p></header>
+<main>
+<div class="equation"><div class="eq">x<sub>n+1</sub> = r x<sub>n</sub>(1 − x<sub>n</sub>)</div><div class="eqnote">For 0 ≤ r ≤ 4 and 0 ≤ x₀ ≤ 1</div></div>
+<div class="layout">
+<aside class="panel">
+<h2>CONTROL PANEL <span style="color:var(--green);float:right">● READY</span></h2>
+<div class="control"><label for="r">Growth parameter r <span class="value" id="rv">0.94</span></label><input id="r" type="range" min="0" max="4" step="0.01" value="0.94"><div class="small">0 = no growth · 4 = maximum parameter</div></div>
+<div class="control"><label for="x0">Initial population x₀ <span class="value" id="xv">0.46</span></label><input id="x0" type="range" min="0" max="1" step="0.001" value="0.46"></div>
+<div class="control"><label for="count">Iteration count <span class="value" id="nv">90</span></label><input id="count" type="range" min="5" max="500" step="5" value="90"></div>
+<div class="actions"><button class="primary" id="run">▶ Run / Update</button><button id="more">＋ More iterations</button><button id="reset">↺ Reset</button></div>
+<div class="control"><label>Experiment presets</label><div class="actions">
+<button data-r="0.5" data-x="0.2">Decay</button><button data-r="2" data-x="0.2">Stable</button><button data-r="3.2" data-x="0.2">Period 2</button><button data-r="3.5" data-x="0.2">Period 4</button><button data-r="3.9" data-x="0.2">Chaotic</button></div></div>
+<div class="control"><label>How to inspect graphs</label><p class="small">Click or tap a plotted point to pin its coordinates below that graph. Use the mouse wheel or pinch to zoom; drag to pan. Each graph has its own Reset zoom button.</p></div>
+<div class="status" id="diagnosis">Calculating…</div>
+</aside>
+<section>
+<div class="results">
+<div class="metric"><div class="label">Current iteration value</div><div class="num" id="current">—</div></div>
+<div class="metric"><div class="label">Fixed point(s) in [0,1]</div><div class="num" id="fixed">—</div></div>
+<div class="metric"><div class="label">Observed behaviour</div><div class="num" id="behaviour" style="font-size:17px">—</div></div>
+</div>
+<div class="grid">
+<article class="card"><h2>1. Iteration graph <span class="small">xₙ vs n</span></h2><canvas id="iteration" class="chart"></canvas><div class="coord" id="coord-iteration">Selected coordinates: none — click a point.</div><div class="chart-tools"><button data-reset="iteration">Reset zoom</button></div></article>
+<article class="card"><h2>2. Cobweb diagram <span class="small">xₙ vs xₙ₊₁</span></h2><canvas id="cobweb" class="chart"></canvas><div class="coord" id="coord-cobweb">Selected coordinates: none — click a point.</div><div class="chart-tools"><button data-reset="cobweb">Reset zoom</button></div></article>
+<article class="card wide"><h2>3. Bifurcation diagram <span class="small">long-term values across r</span></h2><canvas id="bifurcation" class="chart tall"></canvas><div class="coord" id="coord-bifurcation">Selected coordinates: none — click a point.</div><div class="chart-tools"><button data-reset="bifurcation">Reset zoom</button><span class="small">Selected r is marked by a vertical line. Click any plotted point to inspect (r, x).</span></div></article>
+<article class="card"><h2>4. Fixed-point stability</h2><div id="stability" class="status">—</div><p class="small" id="stability-detail"></p></article>
+<article class="card"><h2>5. Numerical sequence</h2><div class="sequence" id="sequence"></div><p class="small">Values are calculated from the recurrence, not generated for display.</p></article>
+</div>
+<footer>Deterministic model · Double precision floating-point arithmetic · Bifurcation plot discards transient iterations before plotting. Clicked coordinates remain pinned until another point is selected or the page is reset.</footer>
+</section></div></main>
+<script>
+const $=id=>document.getElementById(id);
+const state={data:[],views:{},selected:{},points:{}};
+const fmt=(v,d=6)=>Number(v).toFixed(d);
+function logistic(r,x){return r*x*(1-x)}
+function iterate(r,x0,n){let a=[x0],x=x0;for(let i=0;i<n;i++){x=logistic(r,x);a.push(x);if(!Number.isFinite(x))break;}return a}
+function fixedPoints(r){let p=[0];if(r>1)p.push((r-1)/r);return p}
+function stability(r,x){return Math.abs(r*(1-2*x))<1-1e-10?'stable':Math.abs(r*(1-2*x))>1+1e-10?'unstable':'neutral'}
+function setupCanvas(c){const rect=c.getBoundingClientRect(),dpr=window.devicePixelRatio||1;c.width=Math.max(1,rect.width*dpr);c.height=Math.max(1,rect.height*dpr);const ctx=c.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);return {ctx,w:rect.width,h:rect.height}}
+function drawAxes(ctx,w,h,plot,xmin,xmax,ymin,ymax,xlabel,ylabel){
+ ctx.fillStyle='#0b1321';ctx.fillRect(0,0,w,h);ctx.strokeStyle='#25334a';ctx.lineWidth=1;ctx.fillStyle='#9aabc5';ctx.font='11px system-ui';
+ for(let i=0;i<=4;i++){let x=plot.l+i*plot.w/4,y=plot.t+i*plot.h/4;ctx.beginPath();ctx.moveTo(x,plot.t);ctx.lineTo(x,plot.t+plot.h);ctx.stroke();ctx.beginPath();ctx.moveTo(plot.l,y);ctx.lineTo(plot.l+plot.w,y);ctx.stroke();ctx.fillText(fmt(xmin+(xmax-xmin)*i/4,2),x-10,h-8);ctx.fillText(fmt(ymax-(ymax-ymin)*i/4,2),5,y+4)}
+ ctx.strokeStyle='#8ea1bb';ctx.beginPath();ctx.moveTo(plot.l,plot.t);ctx.lineTo(plot.l,plot.t+plot.h);ctx.lineTo(plot.l+plot.w,plot.t+plot.h);ctx.stroke();
+ ctx.fillStyle='#c4d3e8';ctx.fillText(xlabel,plot.l+plot.w/2-30,h-25);ctx.save();ctx.translate(13,plot.t+plot.h/2);ctx.rotate(-Math.PI/2);ctx.fillText(ylabel,0,0);ctx.restore();
+}
+function chart(id,kind,drawFn,domain,labels){
+ const c=$(id),{ctx,w,h}=setupCanvas(c),base={l:48,t:15,w:w-65,h:h-52};
+ let view=state.views[id]||{...domain};state.views[id]=view;
+ const X=v=>base.l+(v-view.xmin)/(view.xmax-view.xmin)*base.w,Y=v=>base.t+(view.ymax-v)/(view.ymax-view.ymin)*base.h;
+ drawAxes(ctx,w,h,base,view.xmin,view.xmax,view.ymin,view.ymax,labels[0],labels[1]);
+ drawFn(ctx,{X,Y,base,view,w,h});
+ c.onpointerdown=e=>{c.setPointerCapture(e.pointerId);c._drag={x:e.offsetX,y:e.offsetY,view:{...view},moved:false}};
+ c.onpointermove=e=>{if(!c._drag)return;let dx=e.offsetX-c._drag.x,dy=e.offsetY-c._drag.y;if(Math.abs(dx)+Math.abs(dy)>3)c._drag.moved=true;if(c._drag.moved){let sx=(view.xmax-view.xmin)/base.w,sy=(view.ymax-view.ymin)/base.h;state.views[id]={xmin:c._drag.view.xmin-dx*sx,xmax:c._drag.view.xmax-dx*sx,ymin:c._drag.view.ymin+dy*sy,ymax:c._drag.view.ymax+dy*sy};renderOne(id)}};
+ c.onpointerup=e=>{if(!c._drag)return;let drag=c._drag;c._drag=null;if(drag.moved)return;const px=e.offsetX,py=e.offsetY;if(px<base.l||px>base.l+base.w||py<base.t||py>base.t+base.h)return;let xv=view.xmin+(px-base.l)/base.w*(view.xmax-view.xmin),yv=view.ymax-(py-base.t)/base.h*(view.ymax-view.ymin);const nearest=nearestPoint(id,xv,yv);if(nearest){state.selected[id]=nearest;updateCoord(id,nearest)}};
+ c.onwheel=e=>{e.preventDefault();let factor=e.deltaY<0?.8:1.25,ax=view.xmin+(e.offsetX-base.l)/base.w*(view.xmax-view.xmin),ay=view.ymax-(e.offsetY-base.t)/base.h*(view.ymax-view.ymin);state.views[id]={xmin:ax+(view.xmin-ax)*factor,xmax:ax+(view.xmax-ax)*factor,ymin:ay+(view.ymin-ay)*factor,ymax:ay+(view.ymax-ay)*factor};renderOne(id)};
+ return {ctx,X,Y,base,view,w,h};
+}
+function nearestPoint(id,x,y){let pts=state.points?.[id]||[];if(!pts.length)return null;let best=null,bd=Infinity;for(const p of pts){let d=(p.x-x)**2+(p.y-y)**2;if(d<bd){bd=d;best=p}}return best}
+function updateCoord(id,p){let label=id==='iteration'?`n = ${p.x}, xₙ = ${fmt(p.y,10)}`:id==='cobweb'?`xₙ = ${fmt(p.x,10)}, xₙ₊₁ = ${fmt(p.y,10)}`:`r = ${fmt(p.x,6)}, x = ${fmt(p.y,10)}`;$('coord-'+id).innerHTML='<strong>Selected coordinates:</strong> '+label}
+function renderOne(id){renderChart(id)}
+function renderChart(id){
+ const r=+ $('r').value,x0=+$('x0').value,n=+$('count').value,a=state.data;
+ if(id==='iteration'){
+  let pts=a.map((v,i)=>({x:i,y:v}));state.points[id]=pts;
+  chart(id,'line',(ctx,{X,Y})=>{ctx.strokeStyle='#55d6e8';ctx.lineWidth=2;ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(X(p.x),Y(p.y)):ctx.moveTo(X(p.x),Y(p.y)));ctx.stroke();ctx.fillStyle='#f3bd58';pts.forEach(p=>{ctx.beginPath();ctx.arc(X(p.x),Y(p.y),2.5,0,7);ctx.fill()});if(state.selected[id]){ctx.strokeStyle='#f3bd58';ctx.beginPath();ctx.arc(X(state.selected[id].x),Y(state.selected[id].y),7,0,7);ctx.stroke()}},{xmin:0,xmax:Math.max(10,a.length-1),ymin:0,ymax:1},['iteration n','xₙ']);
+ }else if(id==='cobweb'){
+  let pts=a.slice(0,-1).map((v,i)=>({x:v,y:a[i+1]}));state.points[id]=pts;
+  chart(id,'cob',(ctx,{X,Y})=>{ctx.strokeStyle='#f3bd58';ctx.setLineDash([5,5]);ctx.beginPath();ctx.moveTo(X(0),Y(0));ctx.lineTo(X(1),Y(1));ctx.stroke();ctx.setLineDash([]);ctx.strokeStyle='#55d6e8';ctx.lineWidth=2;ctx.beginPath();for(let i=0;i<=200;i++){let x=i/200,y=logistic(r,x);i?ctx.lineTo(X(x),Y(y)):ctx.moveTo(X(x),Y(y))}ctx.stroke();ctx.strokeStyle='#ed83c5';ctx.lineWidth=1.5;let prev=x0;for(let i=1;i<a.length;i++){let next=a[i];ctx.beginPath();ctx.moveTo(X(prev),Y(prev));ctx.lineTo(X(prev),Y(next));ctx.lineTo(X(next),Y(next));ctx.stroke();prev=next}},{xmin:0,xmax:1,ymin:0,ymax:1},['xₙ','xₙ₊₁']);
+ }else if(id==='bifurcation'){
+  let pts=[];chart(id,'scatter',(ctx,{X,Y,base})=>{ctx.fillStyle='#55d6e8';ctx.globalAlpha=.48;for(let ri=0;ri<=400;ri++){let rr=ri/100;let xx=.231;for(let k=0;k<900;k++)xx=logistic(rr,xx);for(let k=0;k<100;k++){xx=logistic(rr,xx);pts.push({x:rr,y:xx});ctx.fillRect(X(rr),Y(xx),1.15,1.15)}}ctx.globalAlpha=1;let sx=X(r);ctx.strokeStyle='#f3bd58';ctx.lineWidth=2;ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(sx,base.t);ctx.lineTo(sx,base.t+base.h);ctx.stroke();ctx.setLineDash([]);state.points[id]=pts;},{xmin:0,xmax:4,ymin:0,ymax:1},['growth parameter r','long-term x']);
+ }
+}
+function render(){
+ let r=+$('r').value,x0=+$('x0').value,n=+$('count').value;
+ $('rv').textContent=fmt(r,2);$('xv').textContent=fmt(x0,3);$('nv').textContent=n;
+ state.data=iterate(r,x0,n);let a=state.data,fx=fixedPoints(r),last=a[a.length-1];
+ $('current').textContent=fmt(last,8);$('fixed').textContent=fx.map(v=>fmt(v,5)).join(' ; ');
+ $('stability').innerHTML=fx.map(v=>`<b>x* = ${fmt(v,6)}</b> is <b style="color:${stability(r,v)==='stable'?'#69d6a4':'#ff8585'}">${stability(r,v)}</b> (|f′(x*)| = ${fmt(Math.abs(r*(1-2*v)),5)})`).join('<br>');
+ $('stability-detail').textContent='For a fixed point, stability requires |f′(x*)| < 1. The nonzero fixed point exists in [0,1] only when r ≥ 1 (at r = 1 it coincides with zero).';
+ let tail=a.slice(Math.max(0,a.length-24));let spread=Math.max(...tail)-Math.min(...tail);
+ let behaviour;if(r<=1)behaviour='Decay to zero';else if(r<=3)behaviour='Stable fixed point';else if(r<3.57)behaviour='Periodic / bifurcating';else behaviour='Potentially chaotic';
+ if(spread<1e-7&&r>1)behaviour='Converged fixed point';
+ $('behaviour').textContent=behaviour;
+ $('diagnosis').textContent=`r = ${fmt(r,2)} · x₀ = ${fmt(x0,3)} · ${n} iterations calculated.`;
+ $('sequence').innerHTML=a.slice(0,Math.min(a.length,160)).map((v,i)=>`<span class="chip">x${i} = ${fmt(v,6)}</span>`).join('');
+ $('sequence').insertAdjacentHTML('beforeend',a.length>160?'<span class="small">… more values calculated</span>':'');
+ ['iteration','cobweb','bifurcation'].forEach(renderChart);
+}
+function resetViews(){state.views={};state.selected={};['iteration','cobweb','bifurcation'].forEach(id=>{$('coord-'+id).textContent='Selected coordinates: none — click a point.'});render()}
+['r','x0','count'].forEach(id=>$(id).addEventListener('input',render));
+$('run').onclick=render;$('more').onclick=()=>{$('count').value=Math.min(500,+$('count').value+50);render()};
+$('reset').onclick=()=>{$('r').value=.94;$('x0').value=.46;$('count').value=90;resetViews()};
+document.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{$('r').value=b.dataset.r;$('x0').value=b.dataset.x;render()});
+document.querySelectorAll('[data-reset]').forEach(b=>b.onclick=()=>{delete state.views[b.dataset.reset];renderChart(b.dataset.reset)});
+window.addEventListener('resize',()=>{clearTimeout(window._rt);window._rt=setTimeout(render,100)});
+render();
+</script>
+</body></html>
