@@ -10,6 +10,8 @@
 - **Vercel**: [https://chaos-engine-snowy.vercel.app](https://chaos-engine-snowy.vercel.app)
 - **GitHub Pages**: [https://notfound77.github.io/chaos-engine/](https://notfound77.github.io/chaos-engine/)
 
+**Created by**: **Binnisha Ghosh** & **Baidik Das**
+
 **CHAOS ENGINE** is an interactive scientific instrument designed for physical mathematics exhibitions. A visitor physically manipulates growth rates, initial conditions, and iteration depth using an **Arduino Uno R3** physical console, while a laptop computes non-linear recurrence equations live and renders six synchronized scientific visualisations at 60 FPS.
 
 ---
