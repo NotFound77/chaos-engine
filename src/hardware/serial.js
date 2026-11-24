@@ -117,9 +117,16 @@
           dataBits: 8,
           stopBits: 1,
           parity: 'none',
-          bufferSize: 1024,
+          bufferSize: 65536, // 64KB buffer prevents BufferOverrunError during high-frequency telemetry
           flowControl: 'none'
         });
+
+        // Set DTR and RTS signals to keep Arduino Uno connection stable
+        try {
+          await this.port.setSignals({ dataTerminalReady: true, requestToSend: true });
+        } catch (sigErr) {
+          console.warn('Signal setting not supported or ignored:', sigErr);
+        }
 
         this.isConnected = true;
         this.buffer = '';
@@ -129,6 +136,7 @@
           message: 'Connected to Arduino Uno R3 via Web Serial API'
         });
 
+        // Start non-blocking resilient reader loop
         this.startReading();
         return true;
       } catch (err) {
@@ -213,7 +221,7 @@
     }
 
     /**
-     * Continuously read incoming serial stream with line buffering
+     * Continuously read incoming serial stream with error resilience and line buffering
      */
     async startReading() {
       if (!this.port || !this.port.readable || this.isReading) return;
@@ -222,37 +230,52 @@
       const textDecoder = new TextDecoder();
 
       try {
-        while (this.port && this.port.readable && this.isConnected) {
-          this.reader = this.port.readable.getReader();
+        while (this.isConnected && this.port) {
+          // Guard: if port was closed or disconnected externally
+          if (!this.port.readable) {
+            if (!this.isConnected) break;
+            await new Promise(r => setTimeout(r, 100));
+            continue;
+          }
+
           try {
-            while (true) {
+            this.reader = this.port.readable.getReader();
+
+            while (this.isConnected) {
               const { value, done } = await this.reader.read();
               if (done) {
+                // Stream ended or cancelled
                 break;
               }
-              if (value) {
+              if (value && value.length > 0) {
                 const chunk = textDecoder.decode(value, { stream: true });
                 this.handleChunk(chunk);
               }
             }
           } catch (readErr) {
+            // Non-fatal error: noise, buffer overrun, framing glitch or Arduino reset
             if (this.isConnected) {
-              console.warn('Serial read error:', readErr);
+              console.warn('Recovering from serial read glitch:', readErr);
+              // Brief stabilization pause before re-acquiring stream
+              await new Promise(r => setTimeout(r, 100));
             }
           } finally {
             if (this.reader) {
-              this.reader.releaseLock();
+              try {
+                this.reader.releaseLock();
+              } catch (lockErr) {}
               this.reader = null;
             }
           }
+
+          // Small yield to let browser event loop breathe
+          await new Promise(r => setTimeout(r, 20));
         }
       } catch (err) {
-        console.warn('Serial stream loop terminated:', err);
+        console.warn('Serial reader loop terminated:', err);
       } finally {
         this.isReading = false;
-        if (this.isConnected) {
-          this.handleDisconnect('Serial stream closed');
-        }
+        // Never forcibly disconnect on read end unless explicitly requested
       }
     }
 
