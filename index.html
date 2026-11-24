@@ -176,6 +176,20 @@
             </div>
           </details>
         </div>
+
+        <!-- Physical Control Panel Help / Pinout Reference -->
+        <div class="virtual-sim-box" style="margin-top: 10px; padding-top: 10px;">
+          <details>
+            <summary style="color: var(--cyan);">🔌 Physical Control Panel &amp; Pinout Guide</summary>
+            <div class="sim-tools" style="font-size: 11px; color: var(--text-muted); line-height: 1.55;">
+              <p><strong>Potentiometer 1 (A0):</strong> Adjusts growth parameter <em>r</em> (0–4). Outer pins &rarr; 5V &amp; GND; wiper &rarr; A0.</p>
+              <p><strong>Potentiometer 2 (A1):</strong> Adjusts initial condition <em>x</em>(0) (0–1). Outer pins &rarr; 5V &amp; GND; wiper &rarr; A1.</p>
+              <p><strong>KY-040 Encoder (D2/D3/D4):</strong> CLK &rarr; D2, DT &rarr; D3, SW &rarr; D4, VCC &rarr; 5V, GND &rarr; GND. Adjusts <em>N</em> (5–500, step 5); SW reserved.</p>
+              <p><strong>Push Buttons (INPUT_PULLUP &rarr; GND):</strong> START/PAUSE &rarr; D5, RESET &rarr; D6, COMPARE &rarr; D7. Pressed reads LOW.</p>
+              <p><strong>Power &amp; Serial:</strong> All components share common GND. USB cable supplies 5V power &amp; 115200-baud serial.</p>
+            </div>
+          </details>
+        </div>
       </aside>
 
       <!-- Right Column: Telemetry & Visualisations -->

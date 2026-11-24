@@ -16,7 +16,7 @@
 
 ---
 
-## 📐 1. Mathematical Foundation
+## 📐 Mathematical Foundation
 
 The core recurrence equation is the **Logistic Map**:
 
@@ -47,41 +47,96 @@ $$\lambda = \lim_{M \to \infty} \frac{1}{M} \sum_{i=0}^{M-1} \ln |f'(x_i)| = \li
 
 ---
 
-## 🔌 2. Hardware Wiring & Pin Configuration
+# Hardware Setup & Pinout
 
-The physical controller runs on an **Arduino Uno R3**:
+![CHAOS ENGINE Wiring Diagram](docs/images/chaos-engine-wiring.png)
 
-| Component | Arduino Pin | Circuit Type | Function in Chaos Engine |
-|---|---|---|---|
-| **Potentiometer 1** | **A0** | Analog In (0–5V) | Controls parameter **$r$** ($0.000$ to $4.000$) |
-| **Potentiometer 2** | **A1** | Analog In (0–5V) | Controls initial condition **$x_0$** ($0.000$ to $1.000$) |
-| **KY-040 Encoder CLK** | **D2** | Digital In / INT0 | Quadrature Clock (Hardware Interrupt) |
-| **KY-040 Encoder DT** | **D3** | Digital In | Quadrature Direction ($N \pm 5$) |
-| **KY-040 Encoder SW** | **D4** | `INPUT_PULLUP` &rarr; GND | Push-button (Cycle Presets) |
-| **START / PAUSE Button** | **D5** | `INPUT_PULLUP` &rarr; GND | Toggle running/paused experiment |
-| **RESET Button** | **D6** | `INPUT_PULLUP` &rarr; GND | Reset to defaults ($r=0.94, x_0=0.46, N=90$) |
-| **COMPARE Button** | **D7** | `INPUT_PULLUP` &rarr; GND | Toggle dual trajectory comparison |
+## 1. Hardware Components
 
-*All buttons connect between their respective digital pin and Arduino GND. Internal pull-up resistors are enabled in software.*
+- **Arduino Uno R3** (physical input controller; no LCD or Raspberry Pi is used)
+- **2 × 10 kΩ potentiometers**
+- **1 × KY-040 rotary encoder**
+- **3 × momentary push buttons**
+- **Breadboard** (for +5V power and common GND distribution)
+- **Jumper wires**
+- **USB cable** for laptop connection
+
+## 2. Complete Arduino Uno Pinout Table
+
+| Component | Component Pin | Arduino Uno Pin |
+|---|---|---|
+| Potentiometer 1 | VCC | 5V |
+| Potentiometer 1 | GND | GND |
+| Potentiometer 1 | OUT / Wiper | A0 |
+| Potentiometer 2 | VCC | 5V |
+| Potentiometer 2 | GND | GND |
+| Potentiometer 2 | OUT / Wiper | A1 |
+| KY-040 | CLK | D2 |
+| KY-040 | DT | D3 |
+| KY-040 | SW | D4 |
+| KY-040 | VCC | 5V |
+| KY-040 | GND | GND |
+| START/PAUSE Button | Terminal 1 | D5 |
+| START/PAUSE Button | Terminal 2 | GND |
+| RESET Button | Terminal 1 | D6 |
+| RESET Button | Terminal 2 | GND |
+| COMPARE Button | Terminal 1 | D7 |
+| COMPARE Button | Terminal 2 | GND |
+
+## 3. Physical Control Panel & Component Wiring
+
+### Potentiometer 1 — Growth Parameter *r*
+- Connected to analog pin **A0** (outer terminals to **5V** and **GND**; middle wiper terminal to **A0**).
+- Adjusts the logistic-map growth parameter $r$ over the range **0 to 4**.
+- Turning the knob smoothly sweeps through decay, fixed-point stability, period-doubling bifurcations, and chaos.
+
+### Potentiometer 2 — Initial Condition *x*(0)
+- Connected to analog pin **A1** (outer terminals to **5V** and **GND**; middle wiper terminal to **A1**).
+- Adjusts the initial population value $x(0)$ over the range **0 to 1**.
+- Turning the knob changes the starting state $x_0$ of the trajectory.
+
+### KY-040 Rotary Encoder — Iteration Count *N*
+- **CLK** &rarr; **D2**, **DT** &rarr; **D3**, **SW** &rarr; **D4**, **VCC** &rarr; **5V**, **GND** &rarr; **GND**.
+- Controls the iteration count $N$ between **5 and 500** in increments/decrements of **5**.
+- The encoder's built-in push button (**SW** on **D4**) is currently reserved for future functionality (`EVENT,ENCODER_PRESS`).
+
+### Push Button 1 — START / PAUSE
+- One terminal &rarr; **D5**, other terminal &rarr; **GND**.
+- Toggles the experiment execution state between running and paused (`EVENT,START`).
+
+### Push Button 2 — RESET
+- One terminal &rarr; **D6**, other terminal &rarr; **GND**.
+- Restores the default experiment parameters ($r = 0.94$, $x_0 = 0.46$, $N = 90$) and resets graph zoom (`EVENT,RESET`).
+
+### Push Button 3 — COMPARE
+- One terminal &rarr; **D7**, other terminal &rarr; **GND**.
+- Activates comparison mode between two trajectories with slightly different initial conditions (`EVENT,COMPARE`).
+
+## 4. Power, Grounding & Electrical Connection Notes
+
+- **Common Ground**: All components (Arduino Uno R3, Potentiometer 1, Potentiometer 2, KY-040 encoder, and all three push buttons) **must share a common GND** rail on the breadboard.
+- **Potentiometer Wiring Safety**: Both 10 kΩ potentiometers connect their two outer terminals to **5V** and **GND**. Their middle terminals (wipers) connect **only** to **A0** and **A1**. **Do not connect the potentiometer wiper to 5V or GND** (doing so creates a direct short circuit at the ends of travel).
+- **Internal Pull-Ups (`INPUT_PULLUP`)**: All three push buttons (**D5**, **D6**, **D7**) and the KY-040 switch (**D4**) use the Arduino's internal `INPUT_PULLUP` resistors and wire directly to **GND**—no external pull-up resistors are required. A pressed button reads **LOW**.
+- **Power & Serial Link**: Connect the Arduino Uno R3 to the laptop using the **USB cable**. USB supplies regulated **5V** power to the Arduino and carries **115200-baud** serial communication to the laptop, which performs all calculations and rendering.
 
 ---
 
-## 📡 3. Serial Communication Protocol
+## 📡 Serial Communication Protocol
 
 The Arduino and browser communicate via the **Web Serial API** at **115200 baud**:
 
 | Packet | Example | Description |
 |---|---|---|
 | `READY` | `READY,CHAOS_ENGINE,1` | Boot handshake sent on Arduino startup. |
-| `PARAM` | `PARAM,2.350,0.460,90` | Parameter stream ($r$, $x_0$, $N$) with deadband filtering. |
+| `PARAM` | `PARAM,2.350,0.460,90` | Parameter stream ($r$, $x_0$, $N$) sent every 100 ms. |
 | `EVENT` | `EVENT,START` | Triggers experiment playback / pause. |
 | `EVENT` | `EVENT,RESET` | Restores default parameters and zoom. |
 | `EVENT` | `EVENT,COMPARE` | Toggles Trajectory Comparison mode. |
-| `EVENT` | `EVENT,ENCODER_PRESS`| Cycles preset experiments. |
+| `EVENT` | `EVENT,ENCODER_PRESS`| Encoder push button event (reserved for future functionality). |
 
 ---
 
-## 📊 4. Six Scientific Visualisation Components
+## 📊 Six Scientific Visualisation Components
 
 1. **Iteration Graph ($x_n$ vs $n$)**:
    - Plots the discrete trajectory with cyan glowing lines and gold data markers.
@@ -102,7 +157,7 @@ The Arduino and browser communicate via the **Web Serial API** at **115200 baud*
 
 ---
 
-## 🚀 5. How to Run the Application
+## 🚀 How to Run the Application
 
 ### Step 1: Clone / Navigate to Workspace
 ```bash
@@ -134,7 +189,7 @@ http://localhost:8000
 
 ---
 
-## 🛠 6. Uploading the Firmware to Arduino Uno
+## 🛠 Uploading the Firmware to Arduino Uno
 
 1. Open `arduino/chaos_engine.ino` in the **Arduino IDE**.
 2. Select Board: **Arduino Uno**.
@@ -143,7 +198,7 @@ http://localhost:8000
 
 ---
 
-## 🧪 7. Automated Test Suite
+## 🧪 Automated Test Suite
 
 Run the full integration test suite in Node.js:
 
@@ -154,6 +209,6 @@ Verifies math calculations, fixed point stability, Lyapunov exponents, serial pr
 
 ---
 
-## ℹ️ 8. Honest Limitations & Browser Requirements
+## ℹ️ Browser Requirements & Limitations
 1. **Web Serial API Support**: The Web Serial API is natively supported in Chromium-based browsers (Google Chrome, Microsoft Edge, Brave, Opera, Chromium). Firefox and Safari do not currently support the Web Serial API standard, but the application automatically falls back to full **SIMULATION MODE** on any browser.
 2. **Localhost Origin**: Web Serial requires a secure context (`http://localhost` or HTTPS). Always use `python3 -m http.server` rather than opening `index.html` directly as `file://`.
