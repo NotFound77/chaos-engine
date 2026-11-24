@@ -1,10 +1,14 @@
 # ⚡ CHAOS ENGINE — Logistic Map Machine
 ### Interactive Physical Mathematics Exhibition & Real-Time Dynamical Systems Lab
 
-![Project Theme](https://img.shields.io/badge/Physics-Dynamical%20Systems-00e5ff?style=for-the-badge)
+[![Live on Vercel](https://img.shields.io/badge/Vercel-Live%20Deployment-000000?style=for-the-badge&logo=vercel)](https://chaos-engine-snowy.vercel.app)
+[![Live on GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Site-222222?style=for-the-badge&logo=github)](https://notfound77.github.io/chaos-engine/)
 ![Hardware](https://img.shields.io/badge/Hardware-Arduino%20Uno%20R3-00e676?style=for-the-badge)
 ![Communication](https://img.shields.io/badge/Serial-Web%20Serial%20API-ffab00?style=for-the-badge)
-![Math](https://img.shields.io/badge/Arithmetic-IEEE%20754%20Float64-ff4081?style=for-the-badge)
+
+**Live Production URLs:**
+- **Vercel**: [https://chaos-engine-snowy.vercel.app](https://chaos-engine-snowy.vercel.app)
+- **GitHub Pages**: [https://notfound77.github.io/chaos-engine/](https://notfound77.github.io/chaos-engine/)
 
 **CHAOS ENGINE** is an interactive scientific instrument designed for physical mathematics exhibitions. A visitor physically manipulates growth rates, initial conditions, and iteration depth using an **Arduino Uno R3** physical console, while a laptop computes non-linear recurrence equations live and renders six synchronized scientific visualisations at 60 FPS.
 
